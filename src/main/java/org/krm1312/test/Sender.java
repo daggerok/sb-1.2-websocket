@@ -38,12 +38,18 @@ public class Sender {
             int cnt = 1000;
 
             Stopwatch sw = Stopwatch.createStarted();
-            for (int i = 0; i < cnt && sw.elapsed(TimeUnit.SECONDS) < 10; i++) {
+            int sent = 0;
+            for (int i = 0; i < cnt; i++) {
                 System.out.println("Sending msg: " + i);
                 template.convertAndSend("/topic/1", "Message: " + i);
+                sent = i;
+                if (sw.elapsed(TimeUnit.SECONDS) > 10) {
+                    System.out.println("Giving up after only sending " + i + " messages");
+                    break;
+                }
             }
 
-            System.out.println("Sent " + cnt + " messages in " + sw);
+            System.out.println("Sent " + sent + " messages in " + sw);
 
             System.exit(0);
         });
