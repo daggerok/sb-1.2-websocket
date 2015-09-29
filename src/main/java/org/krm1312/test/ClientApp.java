@@ -15,6 +15,8 @@
  */
 package org.krm1312.test;
 
+import com.google.common.base.Stopwatch;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
@@ -77,7 +79,9 @@ public class ClientApp {
 		latch.await(5000, TimeUnit.MILLISECONDS);
 		ChannelStream<Message<byte[]>, Message<byte[]>> channelStream = reference.get();
 
-		for (int i=0; i < 5; i++) {
+		int cnt = 1000;
+		Stopwatch sw = Stopwatch.createStarted();
+		for (int i=0; i < cnt; i++) {
 			logger.debug("Sending message: " + i);
 			StompHeaderAccessor outAccessor = StompHeaderAccessor.create(StompCommand.SEND);
 			outAccessor.setDestination("/topic/foo");
@@ -86,6 +90,7 @@ public class ClientApp {
 			channelStream.writeWith(Streams.just(outMessage)).subscribe(promise);
 			promise.await();
 		}
+		logger.info("Sent {} in {}", cnt, sw);
 
 		System.in.read();
 
